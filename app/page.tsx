@@ -27,12 +27,34 @@ const reasons = [
   'Meninggal dunia'
 ];
 
+// Group reasons based on PP 35/2021 compensation rules
+const fullCompensationReasons = [
+  'Penggabungan perusahaan',
+  'Pengambil alihan perusahaan',
+  'Efisiensi mengalami kerugian',
+  'Efisiensi mencegah kerugian',
+  'Perusahaan tutup rugi',
+  'Force majeure tutup',
+  'PKPU rugi',
+  'Perusahaan pailit',
+  'Permohonan PHK pasal 36 G',
+  'Sakit berkepanjangan',
+  'Usia pensiun',
+  'Meninggal dunia'
+];
+
+const halfCompensationReasons = [
+  'Perusahaan tutup bukan rugi',
+  'Force majeure tidak tutup',
+  'PKPU bukan rugi'
+];
+
 export default function Home() {
   const [gaji, setGaji] = useState('');
   const [masuk, setMasuk] = useState('');
   const [keluar, setKeluar] = useState('');
   const [uph, setUph] = useState('');
-  const [cuti, setCuti] = useState('');
+  const [cutiHari, setCutiHari] = useState('');
   const [reason, setReason] = useState(reasons[0]);
   const [result, setResult] = useState<any[]>([]);
 
@@ -64,24 +86,45 @@ export default function Home() {
     else if (years >= 21 && years < 24) upmk = 8;
     else if (years >= 24) upmk = 10;
 
-    const up = bulanUpah * gp;
-    const upmkVal = upmk * gp;
+    // Apply compensation factor based on reason
+    let compensationFactor = 1;
+    if (halfCompensationReasons.includes(reason)) {
+      compensationFactor = 0.5;
+    } else if (!fullCompensationReasons.includes(reason)) {
+      compensationFactor = 0;
+    }
+
+    // Calculate compensation components
+    const up = bulanUpah * gp * compensationFactor;
+    const upmkVal = upmk * gp * compensationFactor;
     const uphVal = parseFloat(uph) || 0;
-    const cutiVal = parseFloat(cuti) || 0;
+    const hariCuti = parseInt(cutiHari) || 0;
+    const nilaiCuti = hariCuti * (gp / 25);
 
     const detail = [
-      { label: 'Gaji Pokok', value: gp.toLocaleString('id-ID') },
+      { label: 'Gaji Pokok + Tunjangan', value: gp.toLocaleString('id-ID') },
       { label: 'Masa Kerja', value: `${years} tahun ${months} bulan ${days} hari` },
-      { label: 'Uang Pesangon (UP)', value: `${bulanUpah} x ${gp.toLocaleString('id-ID')} = ${up.toLocaleString('id-ID')}` },
-      { label: 'Uang Penghargaan Masa Kerja (UPMK)', value: `${upmk} x ${gp.toLocaleString('id-ID')} = ${upmkVal.toLocaleString('id-ID')}` },
-      { label: 'Uang Penggantian Hak (UPH)', value: uphVal.toLocaleString('id-ID') },
-      { label: 'Sisa Cuti', value: cutiVal.toLocaleString('id-ID') },
-      { 
-        label: 'Total Pesangon', 
-        value: (up + upmkVal + uphVal + cutiVal).toLocaleString('id-ID'),
-        isTotal: true 
-      }
+      { label: 'Alasan PHK', value: reason },
+      { label: 'Faktor Kompensasi', value: compensationFactor === 0 ? 'Tidak berhak' : compensationFactor === 0.5 ? '50%' : '100%' },
     ];
+
+    if (compensationFactor > 0) {
+      detail.push(
+        { label: 'Uang Pesangon (UP)', value: `${bulanUpah} x ${gp.toLocaleString('id-ID')} x ${compensationFactor} = ${up.toLocaleString('id-ID')}` },
+        { label: 'Uang Penghargaan Masa Kerja (UPMK)', value: `${upmk} x ${gp.toLocaleString('id-ID')} x ${compensationFactor} = ${upmkVal.toLocaleString('id-ID')}` }
+      );
+    }
+
+    detail.push(
+      { label: 'Uang Penggantian Hak (UPH)', value: uphVal.toLocaleString('id-ID') },
+      { label: 'Sisa Cuti', value: `${hariCuti} hari x (${gp.toLocaleString('id-ID')} / 25) = ${nilaiCuti.toLocaleString('id-ID')}` }
+    );
+
+    detail.push({ 
+      label: 'Total Pesangon', 
+      value: (up + upmkVal + uphVal + nilaiCuti).toLocaleString('id-ID'),
+      isTotal: true 
+    });
     
     setResult(detail);
   };
@@ -130,13 +173,13 @@ export default function Home() {
           />
         </div>
         <div>
-          <label>Sisa Cuti (dalam rupiah)</label>
+          <label>Sisa Hari Cuti</label>
           <input 
             type="number" 
             className="w-full border rounded p-2" 
-            value={cuti} 
-            onChange={e => setCuti(e.target.value)} 
-            placeholder="Rp"
+            value={cutiHari} 
+            onChange={e => setCutiHari(e.target.value)} 
+            placeholder="Jumlah hari"
           />
         </div>
         <div>
