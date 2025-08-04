@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 
-/* ---------- 1. Daftar alasan PHK & faktor kompensasi (PP 35/2021) ---------- */
 const reasons = [
   'Perusahaan melakukan efisiensi karena mengalami kerugian',
   'Perusahaan melakukan efisiensi untuk mencegah kerugian',
@@ -26,7 +25,6 @@ const reasons = [
   'Pekerja meninggal dunia'
 ] as const;
 
-/* Mapping alasan → faktor kompensasi */
 const factorMap: Record<string, number> = {
   'Perusahaan melakukan efisiensi karena mengalami kerugian': 0.5,
   'Perusahaan melakukan efisiensi untuk mencegah kerugian': 1.0,
@@ -87,8 +85,12 @@ export default function Home() {
     else if (years >= 24) upmk = 10;
 
     const compensationFactor = factorMap[reason] ?? 0;
+
+    /* --- PERBAIKAN: UPMK selalu dikali 1.0 kecuali faktor 0.0 --- */
+    const upmkFactor = compensationFactor === 0 ? 0 : 1.0;
+
     const up = bulanUpah * gp * compensationFactor;
-    const upmkVal = upmk * gp * compensationFactor;
+    const upmkVal = upmk * gp * upmkFactor;
     const uphVal = parseFloat(uph) || 0;
     const hariCuti = parseInt(cutiHari) || 0;
     const nilaiCuti = hariCuti * (gp / 25);
@@ -103,7 +105,7 @@ export default function Home() {
     if (compensationFactor > 0) {
       detail.push(
         { label: 'Uang Pesangon (UP)', value: `${bulanUpah} × ${gp.toLocaleString('id-ID')} × ${compensationFactor} = ${up.toLocaleString('id-ID')}` },
-        { label: 'UPMK', value: `${upmk} × ${gp.toLocaleString('id-ID')} × ${compensationFactor} = ${upmkVal.toLocaleString('id-ID')}` }
+        { label: 'UPMK', value: `${upmk} × ${gp.toLocaleString('id-ID')} × ${upmkFactor} = ${upmkVal.toLocaleString('id-ID')}` }
       );
     }
 
@@ -127,34 +129,28 @@ export default function Home() {
           <label>Gaji Pokok + Tunjangan Tetap (Rp)</label>
           <input type="number" className="w-full border rounded p-2" value={gaji} onChange={e => setGaji(e.target.value)} placeholder="0" />
         </div>
-
         <div>
           <label>Tanggal Masuk</label>
           <input type="date" className="w-full border rounded p-2" value={masuk} onChange={e => setMasuk(e.target.value)} />
         </div>
-
         <div>
           <label>Tanggal Keluar</label>
           <input type="date" className="w-full border rounded p-2" value={keluar} onChange={e => setKeluar(e.target.value)} />
         </div>
-
         <div>
           <label>Uang Penggantian Hak (UPH) (Rp)</label>
           <input type="number" className="w-full border rounded p-2" value={uph} onChange={e => setUph(e.target.value)} placeholder="0" />
         </div>
-
         <div>
           <label>Sisa Hari Cuti</label>
           <input type="number" className="w-full border rounded p-2" value={cutiHari} onChange={e => setCutiHari(e.target.value)} placeholder="0" />
         </div>
-
         <div>
           <label>Alasan PHK</label>
           <select className="w-full border rounded p-2" value={reason} onChange={e => setReason(e.target.value)}>
             {reasons.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
-
         <button onClick={calculate} className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">
           Hitung Pesangon
         </button>
