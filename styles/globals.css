@@ -27,7 +27,7 @@
   /* Focus ring yang lebih halus */
   input:focus-visible,
   select:focus-visible {
-    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-50 outline-none;
+    @apply ring-2 ring-green-400 ring-offset-2 ring-offset-gray-50 outline-none;
   }
 
   /* Tombol dengan bayangan lembut */
