@@ -1,53 +1,68 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 
+/* ----------------------------------------------------------
+   1. Daftar alasan PHK (PP 35/2021) – urut sesuai tabel
+---------------------------------------------------------- */
 const reasons = [
-  'Perusahaan melakukan efisiensi karena mengalami kerugian',
-  'Perusahaan melakukan efisiensi untuk mencegah kerugian',
-  'Perusahaan tutup karena mengalami kerugian',
-  'Perusahaan tutup bukan karena mengalami kerugian',
-  'Perusahaan tutup karena force majeure',
-  'Terjadi force majeure yang tidak mengakibatkan perusahaan tutup',
-  'Perusahaan dalam keadaan PKPU karena mengalami kerugian',
-  'Perusahaan dalam keadaan PKPU bukan karena mengalami kerugian',
-  'Perusahaan mengalami pailit',
-  'Pekerja mengajukan PHK karena pengusaha melakukan perbuatan Pasal 36 huruf G',
-  'Putusan Lembaga PHI menyatakan pengusaha tidak melakukan perbuatan Pasal 36 huruf G',
-  'Pekerja mengundurkan diri atas kemauan sendiri',
-  'Pekerja mangkir ≥ 5 hari kerja berturut-turut tanpa keterangan tertulis',
-  'Pekerja melanggar PK/PP/PKB setelah diberi SP-1, SP-2, SP-3',
-  'Pekerja melanggar bersifat mendesak sesuai PK/PP/PKB',
-  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I dan merugikan perusahaan',
-  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I tanpa merugikan perusahaan',
-  'Pekerja sakit berkepanjangan atau cacat akibat kecelakaan kerja > 12 bulan',
-  'Pekerja memasuki usia pensiun',
-  'Pekerja meninggal dunia'
+  'Penggabungan, peleburan, pemisahan, pekerja atau pengusaha tidak bersedia melanjutkan (P41)',
+  'Pengambilalihan perusahaan (P42.1)',
+  'Perubahan syarat kerja, pekerja tidak bersedia melanjutkan hubungan kerja (P42.2)',
+  'Perusahaan melakukan efisiensi karena mengalami kerugian (P43.1)',
+  'Perusahaan melakukan efisiensi untuk mencegah kerugian (P43.2)',
+  'Perusahaan tutup karena mengalami kerugian (P44.1)',
+  'Perusahaan tutup bukan karena mengalami kerugian (P44.2)',
+  'Perusahaan tutup karena force majeure (P45.1)',
+  'Terjadi force majeure yang tidak mengakibatkan perusahaan tutup (P45.2)',
+  'Perusahaan dalam keadaan PKPU karena mengalami kerugian (P46.1)',
+  'Perusahaan dalam keadaan PKPU bukan karena mengalami kerugian (P46.2)',
+  'Perusahaan mengalami pailit (P47)',
+  'Pekerja mengajukan PHK karena pengusaha melakukan perbuatan Pasal 36 huruf G (P48)',
+  'Putusan Lembaga PHI menyatakan pengusaha tidak melakukan perbuatan Pasal 36 huruf G (P49)',
+  'Pekerja mengundurkan diri atas kemauan sendiri (P50)',
+  'Pekerja mangkir ≥ 5 hari kerja berturut-turut tanpa keterangan tertulis (P51)',
+  'Pekerja melanggar PK/PP/PKB setelah diberi SP-1, SP-2, SP-3 (P52.1)',
+  'Pekerja melanggar bersifat mendesak sesuai PK/PP/PKB (P52.2)',
+  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I dan merugikan perusahaan (P54.1)',
+  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I tanpa merugikan perusahaan (P54.2)',
+  'Pekerja sakit berkepanjangan atau cacat akibat kecelakaan kerja > 12 bulan (P55.1)',
+  'Pekerja memasuki usia pensiun (P56)',
+  'Pekerja meninggal dunia (P57)'
 ] as const;
 
+/* ----------------------------------------------------------
+   2. Faktor kompensasi (kolom UP) – dipakai langsung
+---------------------------------------------------------- */
 const factorMap: Record<string, number> = {
-  'Perusahaan melakukan efisiensi karena mengalami kerugian': 0.5,
-  'Perusahaan melakukan efisiensi untuk mencegah kerugian': 1.0,
-  'Perusahaan tutup karena mengalami kerugian': 0.5,
-  'Perusahaan tutup bukan karena mengalami kerugian': 1.0,
-  'Perusahaan tutup karena force majeure': 0.5,
-  'Terjadi force majeure yang tidak mengakibatkan perusahaan tutup': 0.75,
-  'Perusahaan dalam keadaan PKPU karena mengalami kerugian': 0.5,
-  'Perusahaan dalam keadaan PKPU bukan karena mengalami kerugian': 1.0,
-  'Perusahaan mengalami pailit': 0.5,
-  'Pekerja mengajukan PHK karena pengusaha melakukan perbuatan Pasal 36 huruf G': 1.0,
-  'Putusan Lembaga PHI menyatakan pengusaha tidak melakukan perbuatan Pasal 36 huruf G': 0,
-  'Pekerja mengundurkan diri atas kemauan sendiri': 0,
-  'Pekerja mangkir ≥ 5 hari kerja berturut-turut tanpa keterangan tertulis': 0,
-  'Pekerja melanggar PK/PP/PKB setelah diberi SP-1, SP-2, SP-3': 0.5,
-  'Pekerja melanggar bersifat mendesak sesuai PK/PP/PKB': 0,
-  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I dan merugikan perusahaan': 0,
-  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I tanpa merugikan perusahaan': 0,
-  'Pekerja sakit berkepanjangan atau cacat akibat kecelakaan kerja > 12 bulan': 2.0,
-  'Pekerja memasuki usia pensiun': 1.75,
-  'Pekerja meninggal dunia': 2.0
+  'Penggabungan, peleburan, pemisahan, pekerja atau pengusaha tidak bersedia melanjutkan (P41)': 1.0,
+  'Pengambilalihan perusahaan (P42.1)': 1.0,
+  'Perubahan syarat kerja, pekerja tidak bersedia melanjutkan hubungan kerja (P42.2)': 0.5,
+  'Perusahaan melakukan efisiensi karena mengalami kerugian (P43.1)': 0.5,
+  'Perusahaan melakukan efisiensi untuk mencegah kerugian (P43.2)': 1.0,
+  'Perusahaan tutup karena mengalami kerugian (P44.1)': 0.5,
+  'Perusahaan tutup bukan karena mengalami kerugian (P44.2)': 1.0,
+  'Perusahaan tutup karena force majeure (P45.1)': 0.5,
+  'Terjadi force majeure yang tidak mengakibatkan perusahaan tutup (P45.2)': 0.75,
+  'Perusahaan dalam keadaan PKPU karena mengalami kerugian (P46.1)': 0.5,
+  'Perusahaan dalam keadaan PKPU bukan karena mengalami kerugian (P46.2)': 1.0,
+  'Perusahaan mengalami pailit (P47)': 0.5,
+  'Pekerja mengajukan PHK karena pengusaha melakukan perbuatan Pasal 36 huruf G (P48)': 1.0,
+  'Putusan Lembaga PHI menyatakan pengusaha tidak melakukan perbuatan Pasal 36 huruf G (P49)': 0.0,
+  'Pekerja mengundurkan diri atas kemauan sendiri (P50)': 0.0,
+  'Pekerja mangkir ≥ 5 hari kerja berturut-turut tanpa keterangan tertulis (P51)': 0.0,
+  'Pekerja melanggar PK/PP/PKB setelah diberi SP-1, SP-2, SP-3 (P52.1)': 0.5,
+  'Pekerja melanggar bersifat mendesak sesuai PK/PP/PKB (P52.2)': 0.0,
+  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I dan merugikan perusahaan (P54.1)': 0.0,
+  'Pekerja ditahan 6 bulan karena tindak pidana Pasal 36 huruf I tanpa merugikan perusahaan (P54.2)': 0.0,
+  'Pekerja sakit berkepanjangan atau cacat akibat kecelakaan kerja > 12 bulan (P55.1)': 2.0,
+  'Pekerja memasuki usia pensiun (P56)': 1.75,
+  'Pekerja meninggal dunia (P57)': 2.0
 };
 
+/* ----------------------------------------------------------
+   3. Bagian lain TIDAK berubah
+---------------------------------------------------------- */
 type DetailRow = { label: string; value: string; isTotal?: true };
 
 export default function Home() {
@@ -85,8 +100,6 @@ export default function Home() {
     else if (years >= 24) upmk = 10;
 
     const compensationFactor = factorMap[reason] ?? 0;
-
-    /* --- PERBAIKAN: UPMK selalu dikali 1.0 kecuali faktor 0.0 --- */
     const upmkFactor = compensationFactor === 0 ? 0 : 1.0;
 
     const up = bulanUpah * gp * compensationFactor;
