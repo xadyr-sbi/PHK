@@ -164,7 +164,7 @@ export default function Home() {
             {reasons.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
-        <button onClick={calculate} className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">
+        <button onClick={calculate} className="w-full bg-black-500 text-white p-2 rounded hover:bg-blue-700 transition">
           Hitung Pesangon
         </button>
       </div>
