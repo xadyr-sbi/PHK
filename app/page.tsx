@@ -170,7 +170,7 @@ export default function Home() {
       </div>
 
       {result.length > 0 && (
-        <div className="mt-6">
+        <div className="mt-6 fade-in">
           <h2 className="text-xl font-semibold mb-4">Hasil Perhitungan</h2>
           <table className="w-full table-auto border-collapse">
             <thead>
