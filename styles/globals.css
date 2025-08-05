@@ -1,3 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =========================================================
+   GLOBAL SMOOTH STYLES
+   ========================================================= */
+
+/* Transisi default untuk elemen interaktif */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply transition-colors duration-200;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+  }
+
+  input,
+  select,
+  button {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  /* Focus ring yang lebih halus */
+  input:focus-visible,
+  select:focus-visible {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-50 outline-none;
+  }
+
+  /* Tombol dengan bayangan lembut */
+  button {
+    @apply shadow-sm hover:shadow-md active:shadow-inner;
+  }
+}
+
+/* Fade-in untuk komponen (mis. tabel hasil) */
+@layer utilities {
+  .fade-in {
+    animation: fadeIn 0.35s ease-in-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
