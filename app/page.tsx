@@ -148,7 +148,7 @@ export default function Home() {
 
   /* ---- seluruh JSX tetap sama ---- */
   return (
-    <div className="w-full max-w-xl bg-white rounded-2xl shadow p-6">
+    <div className="w-full max-w-xl card-primary p-6">
       <h1 className="text-2xl font-bold text-center">Hitung Pesangon PHK</h1>
       <p className="text-center mb-1 font-semibold">PP 35 Tahun 2021</p>
       <p className="text-center text-base font-extrabold tracking-wide text-gray-800">SBTP-FSBI</p>
