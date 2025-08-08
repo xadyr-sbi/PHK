@@ -1,3 +1,4 @@
+// Tambahkan ini di baris paling atas
 'use client';
 
 import { useState } from 'react';
@@ -61,7 +62,7 @@ const factorMap: Record<string, number> = {
 };
 
 /* ----------------------------------------------------------
-   3. Bagian lain TIDAK berubah
+   3. Bagian lain TIDAK berubah – kecuali blok hitung masa kerja
 ---------------------------------------------------------- */
 type DetailRow = { label: string; value: string; isTotal?: true };
 
@@ -79,10 +80,23 @@ export default function Home() {
     const join = new Date(masuk);
     const leave = new Date(keluar);
 
-    const diffMs = leave.getTime() - join.getTime();
-    const years = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 365.25));
-    const months = Math.floor((diffMs % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24 * 30.44));
-    const days = Math.floor((diffMs % (1000 * 60 * 60 * 24 * 30.44)) / (1000 * 60 * 60 * 24));
+    /* ---------- Hitung tahun, bulan, hari TEPAT ---------- */
+    let y = leave.getFullYear() - join.getFullYear();
+    let m = leave.getMonth() - join.getMonth();
+    let d = leave.getDate() - join.getDate();
+
+    if (d < 0) {
+      m--;
+      d += new Date(leave.getFullYear(), leave.getMonth(), 0).getDate();
+    }
+    if (m < 0) {
+      y--;
+      m += 12;
+    }
+    const years = y;
+    const months = m;
+    const days = d;
+    /* ----------------------------------------------------- */
 
     let bulanUpah = 0;
     if (years < 1) bulanUpah = 1;
@@ -105,7 +119,8 @@ export default function Home() {
     const up = bulanUpah * gp * compensationFactor;
     const upmkVal = upmk * gp * upmkFactor;
     const uphVal = parseFloat(uph) || 0;
-    const hariCuti = parseInt(cutiHari) || 0;
+
+    const hariCuti = parseFloat(cutiHari) || 0;
     const nilaiCuti = hariCuti * (gp / 25);
 
     const detail: DetailRow[] = [
@@ -131,6 +146,7 @@ export default function Home() {
     setResult(detail);
   };
 
+  /* ---- seluruh JSX tetap sama ---- */
   return (
     <div className="w-full max-w-xl bg-white rounded-2xl shadow p-6">
       <h1 className="text-2xl font-bold text-center">Hitung Pesangon PHK</h1>
@@ -155,8 +171,8 @@ export default function Home() {
           <input type="number" className="w-full border rounded p-2" value={uph} onChange={e => setUph(e.target.value)} placeholder="0" />
         </div>
         <div>
-          <label>Sisa Hari Cuti</label>
-          <input type="number" className="w-full border rounded p-2" value={cutiHari} onChange={e => setCutiHari(e.target.value)} placeholder="0" />
+          <label>Sisa Hari Cuti (boleh desimal, mis. 2,5)</label>
+          <input type="number" step="0.01" className="w-full border rounded p-2" value={cutiHari} onChange={e => setCutiHari(e.target.value)} placeholder="0" />
         </div>
         <div>
           <label>Alasan PHK</label>
