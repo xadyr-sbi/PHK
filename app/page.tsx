@@ -171,7 +171,7 @@ export default function Home() {
           <input type="number" className="w-full border rounded p-2" value={uph} onChange={e => setUph(e.target.value)} placeholder="0" />
         </div>
         <div>
-          <label>Sisa Hari Cuti (boleh desimal, mis. 2,5)</label>
+          <label>Sisa Hari Cuti (boleh desimal)</label>
           <input type="number" step="0.01" className="w-full border rounded p-2" value={cutiHari} onChange={e => setCutiHari(e.target.value)} placeholder="0" />
         </div>
         <div>
