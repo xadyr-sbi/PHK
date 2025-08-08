@@ -1,3 +1,11 @@
+/* =========================================================
+   IMPORT FONT (opsional, contoh Inter)
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* =========================================================
+   TAILWIND LAYERS
+   ========================================================= */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,7 +14,7 @@
    GLOBAL SMOOTH STYLES
    ========================================================= */
 
-/* Transisi default untuk elemen interaktif */
+/* 1. Gradasi background halus */
 @layer base {
   *,
   *::before,
@@ -15,7 +23,8 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+    /* ubah font + beri gradasi background */
+    @apply bg-gradient-to-br from-gray-50 via-white to-slate-100 text-gray-900 font-['Inter',_ui-sans-serif,_system-ui,_sans-serif] antialiased;
   }
 
   input,
@@ -36,7 +45,14 @@
   }
 }
 
-/* Fade-in untuk komponen (mis. tabel hasil) */
+/* 2. Kartu utama: warna hangat + bayangan */
+@layer components {
+  .card-primary {
+    @apply bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg shadow-slate-200/40;
+  }
+}
+
+/* 3. Fade-in untuk komponen (mis. tabel hasil) */
 @layer utilities {
   .fade-in {
     animation: fadeIn 0.35s ease-in-out forwards;
