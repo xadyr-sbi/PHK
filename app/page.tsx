@@ -139,7 +139,7 @@ export default function Home() {
 
     detail.push(
       { label: 'Uang Penggantian Hak (UPH)', value: uphVal.toLocaleString('id-ID') },
-      { label: 'Sisa Cuti', value: `${hariCuti} hari × (${gp.toLocaleString('id-ID')} ÷ 25) = ${nilaiCuti.toLocaleString('id-ID')}` },
+      { label: 'Sisa Cuti', value: `${hariCuti} hari × (${gp.toLocaleString('id-ID')} ÷ 21) = ${nilaiCuti.toLocaleString('id-ID')}` },
       { label: 'Total Pesangon', value: (up + upmkVal + uphVal + nilaiCuti).toLocaleString('id-ID'), isTotal: true }
     );
 
