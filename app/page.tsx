@@ -121,7 +121,7 @@ export default function Home() {
     const uphVal = parseFloat(uph) || 0;
 
     const hariCuti = parseFloat(cutiHari) || 0;
-    const nilaiCuti = hariCuti * (gp / 25);
+    const nilaiCuti = hariCuti * (gp / 21);
 
     const detail: DetailRow[] = [
       { label: 'Gaji Pokok + Tunjangan Tetap', value: gp.toLocaleString('id-ID') },
