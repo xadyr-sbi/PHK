@@ -72,6 +72,7 @@ export default function Home() {
   const [keluar, setKeluar] = useState('');
   const [uph, setUph] = useState('');
   const [cutiHari, setCutiHari] = useState('');
+  const [jenisHariKerja, setJenisHariKerja] = useState<'5hari' | '6hari'>('5hari');
   const [reason, setReason] = useState<string>(reasons[0]);
   const [result, setResult] = useState<DetailRow[]>([]);
 
@@ -120,8 +121,10 @@ export default function Home() {
     const upmkVal = upmk * gp * upmkFactor;
     const uphVal = parseFloat(uph) || 0;
 
+    /* ---------- Perhitungan Sisa Cuti dengan pembagi sesuai pilihan ---------- */
     const hariCuti = parseFloat(cutiHari) || 0;
-    const nilaiCuti = hariCuti * (gp / 21);
+    const pembagi = jenisHariKerja === '5hari' ? 21 : 25;
+    const nilaiCuti = hariCuti * (gp / pembagi);
 
     const detail: DetailRow[] = [
       { label: 'Gaji Pokok + Tunjangan Tetap', value: gp.toLocaleString('id-ID') },
@@ -139,14 +142,14 @@ export default function Home() {
 
     detail.push(
       { label: 'Uang Penggantian Hak (UPH)', value: uphVal.toLocaleString('id-ID') },
-      { label: 'Sisa Cuti', value: `${hariCuti} hari × (${gp.toLocaleString('id-ID')} ÷ 21) = ${nilaiCuti.toLocaleString('id-ID')}` },
+      { label: 'Sisa Cuti', value: `${hariCuti} hari × (${gp.toLocaleString('id-ID')} ÷ ${pembagi}) = ${nilaiCuti.toLocaleString('id-ID')}` },
       { label: 'Total Pesangon', value: (up + upmkVal + uphVal + nilaiCuti).toLocaleString('id-ID'), isTotal: true }
     );
 
     setResult(detail);
   };
 
-  /* ---- seluruh JSX tetap sama ---- */
+  /* ---- JSX dengan tambahan pilihan hari kerja ---- */
   return (
     <div className="w-full max-w-xl card-primary p-6">
       <h1 className="text-2xl font-bold text-center">Hitung Pesangon PHK</h1>
@@ -174,6 +177,39 @@ export default function Home() {
           <label>Sisa Hari Cuti (boleh desimal)</label>
           <input type="number" step="0.01" className="w-full border rounded p-2" value={cutiHari} onChange={e => setCutiHari(e.target.value)} placeholder="0" />
         </div>
+        
+        {/* Tambahan kolom centang untuk pilihan hari kerja */}
+        <div className="border rounded p-3 bg-gray-50">
+          <label className="block font-semibold mb-2">Jenis Hari Kerja</label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="radio" 
+                name="jenisHariKerja" 
+                value="5hari" 
+                checked={jenisHariKerja === '5hari'} 
+                onChange={() => setJenisHariKerja('5hari')}
+                className="w-4 h-4"
+              />
+              <span>5 Hari Kerja (pembagi 21)</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="radio" 
+                name="jenisHariKerja" 
+                value="6hari" 
+                checked={jenisHariKerja === '6hari'} 
+                onChange={() => setJenisHariKerja('6hari')}
+                className="w-4 h-4"
+              />
+              <span>6 Hari Kerja (pembagi 25)</span>
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            {jenisHariKerja === '5hari' ? 'Pembagi 21 hari kerja per bulan' : 'Pembagi 25 hari kerja per bulan'}
+          </p>
+        </div>
+
         <div>
           <label>Alasan PHK</label>
           <select className="w-full border rounded p-2" value={reason} onChange={e => setReason(e.target.value)}>
